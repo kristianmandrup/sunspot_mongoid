@@ -33,7 +33,7 @@ namespace :sunspot do
     t.clear_actions
     t.clear_prerequisites
     unless args[:models]
-      all_files = Dir.glob(Rails.root.join('app', 'models', '*.rb'))
+      all_files = Dir.glob(Rails.root.join('app', 'models', '{**}', '*.rb'))
       all_models = all_files.map { |path| File.basename(path, '.rb').camelize.constantize }
       sunspot_models = all_models.select { |m| m.respond_to?(:searchable?) and m.searchable? }
     else
