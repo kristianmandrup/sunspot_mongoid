@@ -35,7 +35,20 @@ namespace :sunspot do
     unless args[:models]
       all_files = Dir.glob(Rails.root.join('app', 'models', '*.rb'))
       all_models = all_files.map { |path| File.basename(path, '.rb').camelize.constantize }
-      sunspot_models = all_models.select { |m| m.respond_to?(:searchable?) and m.searchable? }
+
+      # get classes from sub directories
+      Dir.glob(Rails.root.join('app', 'models', '*/')).each do |folder|
+        all_files = Dir.glob(Rails.root.join(folder, '*.rb'))
+        all_files.each do |path|
+          begin
+            all_models << (folder.split('/').last + '/' + File.basename(path, '.rb')).camelize.constantize
+          rescue Exception=>e
+            nil
+          end
+        end
+      end
+
+      sunspot_models = all_models.compact.select { |m| m.respond_to?(:searchable?) and m.searchable? }
     else
       sunspot_models = args[:models].split('+').map{|m| m.constantize}
     end
